@@ -1,8 +1,15 @@
 (define-module (common))
 
+;;
+;; Testing
+;;
+
 (define-public (assert msg b)
   (if (not b) (error msg)))
 
+;;
+;; File handling
+;;
 
 ;; copied from http://eikmeier.sites.grinnell.edu/csc151S20/readings/files.html
 (define-public read-line-of-chars
@@ -39,3 +46,29 @@
         (if (null? line)
             line
             (cons line (f (read-line p))))))))
+
+;;
+;; Macros
+;;
+
+(define-syntax ->
+  (syntax-rules ()
+    ((_) #f)
+    ((_ x) x)
+    ((_ x (f . (f-rest ...))) (f x f-rest ...))
+    ((_ x f) (f x))
+    ((_ x (f . (f-rest ...)) rest ...) (-> (f x f-rest ...) rest ...))
+    ((_ x f rest ...) (-> (f x) rest ...))))
+
+(export ->)
+
+(define-syntax ->>
+  (syntax-rules ()
+    ((_) #f)
+    ((_ x) x)
+    ((_ x (f ...)) (f ... x))
+    ((_ x f) `(f x))
+    ((_ x (f ...) rest ...) (->> (f ... x) rest ...))
+    ((_ x f rest ...) (->> (f x) rest ...))))
+
+(export ->>)
