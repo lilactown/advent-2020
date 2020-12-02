@@ -1,4 +1,4 @@
-#!/usr/local/bin/guile -s
+#!/usr/local/bin/guile -L .. -s
 !#
 
 (use-modules
