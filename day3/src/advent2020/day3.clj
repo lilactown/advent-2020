@@ -33,14 +33,13 @@
 
 (defn move
   [grid right down]
-  (let [grid' (-> (drop down grid) ;; move down by just removing rows
-                  (vec))]
+  (let [grid' (drop down grid)] ;; move down by just removing rows
     ;; move each row `right` number of columns right
-    (mapv (fn [row]
-            (let [[behind-us row'] (split-at right row)]
-              ;; each time we move right, take whatever is to the left of us
-              ;; and add it back onto the row, simulating an infinite grid
-              (into (vec row') behind-us)))
+    (map (fn [row]
+           (let [[behind-us row'] (split-at right row)]
+             ;; each time we move right, take whatever is to the left of us
+             ;; and add it back onto the row, simulating an infinite grid
+             (into (vec row') behind-us)))
           grid')))
 
 
