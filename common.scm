@@ -47,6 +47,16 @@
             line
             (cons line (f (read-line p))))))))
 
+
+(define-public (read-file-contents file)
+  (list->string
+   (call-with-input-file file
+     (lambda (p)
+       (let f ((c (read-char p)))
+         (if (eof-object? c)
+             '()
+             (cons c (f (read-char p)))))))))
+
 ;;
 ;; Macros
 ;;
