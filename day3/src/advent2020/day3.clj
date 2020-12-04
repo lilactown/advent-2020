@@ -32,12 +32,14 @@
 ;; => [[\. \. \# \# \. \. \. \. \. \. \.] [\# \. \. \. \# \. \. \. \# \. \.] [\. \# \. \. \. \. \# \. \. \# \.] [\. \. \# \. \# \. \. \. \# \. \#] [\. \# \. \. \. \# \# \. \. \# \.] [\. \. \# \. \# \# \. \. \. \. \.] [\. \# \. \# \. \# \. \. \. \. \#] [\. \# \. \. \. \. \. \. \. \. \#] [\# \. \# \# \. \. \. \# \. \. \.] [\# \. \. \. \# \# \. \. \. \. \#] [\. \# \. \. \# \. \. \. \# \. \#]]
 
 (defn move
-  [grid x y]
-  (let [grid' (-> (split-at y grid) ;; move down
-                  (second)
+  [grid right down]
+  (let [grid' (-> (drop down grid) ;; move down by just removing rows
                   (vec))]
+    ;; move each row `right` number of columns right
     (mapv (fn [row]
-            (let [[behind-us row'] (split-at x row)]
+            (let [[behind-us row'] (split-at right row)]
+              ;; each time we move right, take whatever is to the left of us
+              ;; and add it back onto the row, simulating an infinite grid
               (into (vec row') behind-us)))
           grid')))
 
@@ -56,11 +58,11 @@
 ;; => [[\# \. \# \. \# \. \. \# \. \. \.]]
 
 (defn part-1
-  [grid x y]
+  [grid right down]
   (loop [grid grid
          trees-hit 0]
     (if-some [row (first grid)]
-      (recur (move grid x y)
+      (recur (move grid right down)
              (if (= TREE (first row))
                (inc trees-hit)
                trees-hit))
