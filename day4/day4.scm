@@ -23,8 +23,11 @@
                 ;; turning the entire structure into an associative list
                 (cons (car split) (cadr split)))))))
 
+(define (input->batch input)
+  (->> input (normalize-input) (map string->passport)))
+
 (define example-batch
-  (->>
+  (input->batch
    "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
 byr:1937 iyr:2017 cid:147 hgt:183cm
 
@@ -37,9 +40,7 @@ ecl:brn pid:760753108 byr:1931
 hgt:179cm
 
 hcl:#cfa07d eyr:2025 pid:166559648
-iyr:2011 ecl:brn hgt:59in"
-   (normalize-input)
-   (map string->passport)))
+iyr:2011 ecl:brn hgt:59in"))
 
 (define required-attributes
   '("byr" "iyr" "eyr" "hgt" "hcl" "ecl" "pid" ;"cid"
@@ -51,8 +52,7 @@ iyr:2011 ecl:brn hgt:59in"
 (assert "test input" (= 2 (count valid-passport? example-batch)))
 
 (format #t "Part 1: ~d\n" (->> (read-file-contents "day4-input")
-                               (normalize-input)
-                               (map string->passport)
+                               (input->batch)
                                (count valid-passport?)))
 
 (define (apply-rule attr+val)
@@ -64,31 +64,26 @@ iyr:2011 ecl:brn hgt:59in"
          ((string=? attr "byr")
           (let ((int-val (string->number val)))
             (and (= 4 (string-length val))
-                 (<= 1920 int-val)
-                 (>= 2002 int-val))))
+                 (<= 1920 int-val 2002))))
          ((string=? attr "iyr")
           (let ((int-val (string->number val)))
             (and (= 4 (string-length val))
-                 (<= 2010 int-val)
-                 (>= 2020 int-val))))
+                 (<= 2010 int-val 2020))))
          ((string=? attr "eyr")
           (let ((int-val (string->number val)))
             (and (= 4 (string-length val))
-                 (<= 2020 int-val)
-                 (>= 2030 int-val))))
+                 (<= 2020 int-val 2030))))
          ((string=? attr "hgt")
           ;; a number followed by either cm or in:
           ;; If cm, the number must be at least 150 and at most 193.
           ;; If in, the number must be at least 59 and at most 76.
-          (let ((units-pos (- (string-length val) 2)))
+          (let ((units-pos (- (string-length val) 2))) ;; last 2 chars are units
             (let ((units (substring val units-pos))
                   (val (string->number (substring val 0 units-pos))))
               (or (and (string=? "cm" units)
-                       (<= 150 val)
-                       (>= 193 val))
+                       (<= 150 val 193))
                   (and (string=? "in" units)
-                       (<= 59 val)
-                       (>= 76 val))))))
+                       (<= 59 val 76))))))
          ((string=? attr "hcl")
           (let ((list-val (string->list val)))
             (and (char=? #\# (car list-val)) ;; first char is #
@@ -103,7 +98,7 @@ iyr:2011 ecl:brn hgt:59in"
          ((string=? attr "ecl")
           (list? (member val '("amb" "blu" "brn" "gry" "grn" "hzl" "oth"))))
          ((string=? attr "pid")
-          (= 9 (length (string->list val))))
+          (= 9 (string-length val)))
          ;; unknown rule
          (else #t)))))
 
@@ -125,6 +120,5 @@ iyr:2011 ecl:brn hgt:59in"
 (assert "test part 2" (= 2 (count strict-valid-passport? example-batch)))
 
 (format #t "Part 2: ~d\n" (->> (read-file-contents "day4-input")
-                               (normalize-input)
-                               (map string->passport)
+                               (input->batch)
                                (count strict-valid-passport?)))
