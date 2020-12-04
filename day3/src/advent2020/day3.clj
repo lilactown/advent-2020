@@ -62,6 +62,7 @@
   (loop [grid grid
          trees-hit 0]
     (if-some [row (first grid)]
+      ;; we haven't reached the bottom
       (recur (move grid right down)
              (if (= TREE (first row))
                (inc trees-hit)
