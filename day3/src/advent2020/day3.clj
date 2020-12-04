@@ -23,9 +23,8 @@
 
 (defn input->grid
   ([input]
-   (vec
-    (for [line (string/split-lines input)]
-      (vec line)))))
+   (for [line (string/split-lines input)]
+     (vec line))))
 
 
 (input->grid test-input)
