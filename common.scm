@@ -82,3 +82,14 @@
     ((_ x f rest ...) (->> (f x) rest ...))))
 
 (export ->>)
+
+
+;;
+;; Lists
+;;
+
+(define-public (contains? el lst)
+  (cond
+   ((null? lst) #f)
+   ((equal? el (car lst)) #t)
+   (else (contains? el (cdr lst)))))
