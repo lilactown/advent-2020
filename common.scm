@@ -1,5 +1,9 @@
 (define-module (common))
 
+(use-modules
+ ;; for list operation
+ (srfi srfi-1))
+
 ;;
 ;; Testing
 ;;
@@ -93,3 +97,29 @@
    ((null? lst) #f)
    ((equal? el (car lst)) #t)
    (else (contains? el (cdr lst)))))
+
+(define-public (list-set lst idx val)
+  (if (null? lst)
+      lst
+      (cons
+       (if (zero? idx)
+           val
+           (car lst))
+       (list-set (cdr lst) (- idx 1) val))))
+
+(define-public (list-update lst idx f)
+  (let ((el (list-ref lst idx)))
+    (list-set lst idx (f el))))
+
+(define-public (list-indices pred lst)
+  (let f ((current-index 0)
+          (indices '())
+          (lst lst))
+    (if (null? lst)
+        (reverse indices)
+        (let ((index (list-index pred lst)))
+          (if (not index)
+              (reverse indices)
+              (f (+ 1 current-index index)
+                 (cons (+ current-index index) indices)
+                 (list-tail lst (+ 1 index))))))))
