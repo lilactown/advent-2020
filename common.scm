@@ -123,3 +123,16 @@
               (f (+ 1 current-index index)
                  (cons (+ current-index index) indices)
                  (list-tail lst (+ 1 index))))))))
+
+;; https://stackoverflow.com/a/20591545/4379329
+(define-public (combinations . lists)
+  (fold-right
+   (lambda (xs ys)
+     (append-map
+      (lambda (x)
+        (map (lambda (y)
+               (cons x y))
+             ys))
+      xs))
+   '(())
+   lists))
